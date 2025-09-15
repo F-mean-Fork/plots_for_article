@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 file_path = f'file_name.txt'
 
 data = np.loadtxt(file_path, skiprows=1)
+# Загружаемый файл в формате столбцов. 
+# Если есть строка с обозначением, какой столбец за что овечает, то
+# skiprows=1,
+# если такой строки нет, то
+# skiprows=0 или убрать
 
 
 p2 = data[:, 0] 
