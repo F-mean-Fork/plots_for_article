@@ -1,64 +1,26 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.colors import BoundaryNorm
-from matplotlib.ticker import MaxNLocator
 
-file_path = 'file_name.txt'
-data = np.loadtxt(file_path)
+file_path = f'file_name.txt'
 
-p2 = data[:, 0]           # p2
-chi1 = data[:, 1]         # chi1
-sigma_ratio = data[:, 2]  # величина для контуров
+data = np.loadtxt(file_path, skiprows=1)
 
-# Минимум и диапазон
-sigma_min = sigma_ratio.min()
-sigma_max = sigma_ratio.max()
 
-# Создаём уровни раскраски
-num_levels_total = 80
-num_near_min = int(0.7 * num_levels_total)
-num_far = num_levels_total - num_near_min
+p2 = data[:, 0] 
+chi1 = data[:, 1]  
+sigma_ratio = data[:, 2] 
 
-# Уровни вблизи минимума
-near_min_threshold = sigma_min + 0.2 * (sigma_max - sigma_min)
-levels_near = np.linspace(sigma_min, near_min_threshold, num_near_min)
+scatter = plt.scatter(p2, chi1, c=sigma_ratio, cmap='viridis', marker="s", s=1100)
+plt.colorbar(scatter, label='$\Sigma_1 / \Sigma_2$')
 
-# Остальные уровни
-levels_far = np.linspace(near_min_threshold, sigma_max, num_far + 1)[1:]  # без дубля
+plt.xlabel('$p_2$', fontsize=18)
+plt.ylabel('$\chi_1$', fontsize=18)
+plt.ylim(0.0, 1.5)
+plt.xlim(1.0, 10)
+plt.yticks(np.arange(0, 1.6, 0.25))
+plt.xticks(np.arange(1.0, 11, 1))
+# plt.title(f"$N_s = {N_s}$")
 
-# Объединяем уровни
-levels = np.concatenate([levels_near, levels_far])
-
-# BoundaryNorm для неравномерного масштабирования цветов
-cmap = plt.get_cmap('jet_r')
-# Можно также попробовать: 'hot', 'afmhot', 'Reds', 'jet_r'
-
-# Сопоставление значени с цветами
-norm = BoundaryNorm(levels, cmap.N)
-
-plt.figure(figsize=(8, 6))
-
-# Закрашенные контуры с неравномерным цветом
-cp = plt.tricontourf(p2, chi1, sigma_ratio, levels=levels, cmap=cmap, norm=norm)
-
-# Чёрные контурные линии
-contours = plt.tricontour(p2, chi1, sigma_ratio, levels=levels, colors='black', linewidths=0.4, alpha=0.6)
-
-# Цветовая шкала
-cbar = plt.colorbar(cp, extend='neither')
-
-# Равномерные метки по диапазону
-tick_positions = np.linspace(sigma_min, sigma_max, 5)
-cbar.set_ticks(tick_positions)
-cbar.set_ticklabels([f'{tick:.3f}' for tick in tick_positions])
-cbar.set_label(r'$\Sigma_1 / \Sigma_2$', fontsize=18)
-plt.setp(cbar.ax.get_yticklabels(), fontsize=14)
-
-plt.yticks(np.arange(0, 1.6, 0.25), fontsize=18)
-plt.xticks(fontsize=16)
-plt.xlabel(r'$p_2$', fontsize=20)
-plt.ylabel(r'$\chi_1$', fontsize=20)
-
+plt.grid(True, color='black', linestyle='-', linewidth=0.5)
 plt.tight_layout()
-plt.savefig("Contour_line_map.png", dpi=150, bbox_inches="tight")
-# plt.show()
+plt.savefig(f"contour_map.png", dpi=150, bbox_inches="tight")
